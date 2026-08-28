@@ -48,5 +48,5 @@ src/generated/  service et modèles générés par `pac code` — NE PAS MODIFIE
 
 ## Documents
 
-- Spécification : `../docs/superpowers/specs/2026-08-28-gogo-helper-design.md`
+- Spécification : `docs/superpowers/specs/2026-08-28-gogo-helper-design.md`
 - Plan d'implémentation : `docs/superpowers/plans/2026-08-28-gogo-helper.md`
