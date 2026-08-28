@@ -1,0 +1,7 @@
+Id connexion :
+shared-sharepointonl-c904333d-3d36-4a2b-871a-947be380fdc0
+
+Id list
+3a99496a-6600-4de9-b15c-847d4f5ee1bc
+
+pac code add-data-source -a shared_sharepointonline \ -c shared-sharepointonl-c904333d-3d36-4a2b-871a-947be380fdc0 -t 3a99496a-6600-4de9-b15c-847d4f5ee1bc \ -d https://alegriaacademy23-my.sharepoint.com/personal/gautier_baleda_alegria_academy

@@ -1,0 +1,31 @@
+{
+  "version": "1.0",
+  "appId": null,
+  "appDisplayName": "GoGo Helper",
+  "region": "prod",
+  "environmentId": "45e88849-549a-ed59-8a14-eac0b2496cfd",
+  "description": "Solution de ticketing helpdesk",
+  "buildPath": "./dist",
+  "buildEntryPoint": "index.html",
+  "localAppUrl": "http://localhost:3000",
+  "logoPath": "Default",
+  "connectionReferences": {
+    "52daf04d-b7ac-4f87-a601-3b996e7ff766": {
+      "id": "/providers/Microsoft.PowerApps/apis/shared_sharepointonline",
+      "displayName": "SharePoint",
+      "dataSources": [
+        "tickets_sharepoint"
+      ],
+      "dataSets": {
+        "https://alegriaacademy23-my.sharepoint.com/personal/gautier_baleda_alegria_academy": {
+          "dataSources": {
+            "tickets_sharepoint": {
+              "tableName": "3a99496a-6600-4de9-b15c-847d4f5ee1bc"
+            }
+          }
+        }
+      }
+    }
+  },
+  "databaseReferences": {}
+}
