@@ -1,75 +1,52 @@
-# React + TypeScript + Vite
+# GoGo Helper
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Solution de ticketing helpdesk construite en Power Apps Code App, au-dessus d'une
+liste SharePoint « Tickets ».
 
-It is preconfigured to work with Power Apps Code Apps.
+## Fonctionnalités
 
-Currently, two official plugins are available:
+- **Demandeur** — soumettre une demande de support et suivre l'avancement de ses tickets.
+- **Gestionnaire** — suivre tous les tickets en kanban ou en liste, filtrer et rechercher,
+  assigner, changer le statut par glisser-déposer, éditer et supprimer.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## Démarrage
 
-## React Compiler
-
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+npm install
+npm run dev      # développement local
+npm test         # tests unitaires (Vitest)
+npm run lint     # ESLint
+npm run build    # build de production
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## Configuration
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+Tout se règle dans `src/config/app.config.ts` :
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+- `managerEmails` — les emails des gestionnaires ; tout autre utilisateur est demandeur.
+  L'en-tête de l'app affiche l'email de l'utilisateur connecté, ce qui permet de relever
+  la valeur exacte à y placer.
+- `statuts`, `priorites`, `categories` — les valeurs de référence, qui donnent l'ordre des
+  colonnes du kanban et remplissent les listes déroulantes. Toute valeur rencontrée dans un
+  ticket mais absente d'ici est ajoutée automatiquement en fin de liste.
+- `couleursStatut`, `couleursPriorite` — les couleurs des badges.
+
+## Architecture
+
 ```
+src/config/     configuration de l'app
+src/domain/     modules purs, testés : mapper, rôles, choix, filtres, règle de statut
+src/data/       accès SharePoint et hook de chargement/mutation
+src/auth/       utilisateur courant via le SDK Power Apps
+src/components/ composants Fluent réutilisables
+src/views/      vue demandeur et vue gestionnaire
+src/generated/  service et modèles générés par `pac code` — NE PAS MODIFIER
+```
+
+`src/domain/ticket.ts` est le seul fichier qui connaît les noms de colonnes SharePoint
+(`field_2`, `field_3`…). Une évolution de la liste ne touche que ce fichier.
+
+## Documents
+
+- Spécification : `../docs/superpowers/specs/2026-08-28-gogo-helper-design.md`
+- Plan d'implémentation : `docs/superpowers/plans/2026-08-28-gogo-helper.md`
