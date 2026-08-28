@@ -11,6 +11,7 @@ import {
 } from '@fluentui/react-components'
 import { useCurrentUser } from './auth/useCurrentUser'
 import { useTickets } from './data/useTickets'
+import { RequesterView } from './views/RequesterView'
 
 export default function App() {
   const utilisateur = useCurrentUser()
@@ -47,7 +48,7 @@ export default function App() {
         {!donnees.charge || !utilisateur.charge ? (
           <Spinner label="Chargement des tickets…" />
         ) : (
-          <Caption1>{donnees.tickets.length} ticket(s) chargé(s).</Caption1>
+          <RequesterView utilisateur={utilisateur} donnees={donnees} />
         )}
       </div>
     </FluentProvider>
