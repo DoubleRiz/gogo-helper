@@ -1,21 +1,22 @@
+import { useState } from 'react'
 import {
-  FluentProvider,
-  MessageBar,
-  MessageBarBody,
-  MessageBarActions,
-  Button,
-  Spinner,
-  Subtitle2,
-  Caption1,
-  webLightTheme,
+  Button, Caption1, FluentProvider, MessageBar, MessageBarActions, MessageBarBody,
+  Spinner, Subtitle2, Tab, TabList, webLightTheme,
 } from '@fluentui/react-components'
 import { useCurrentUser } from './auth/useCurrentUser'
 import { useTickets } from './data/useTickets'
+import { ManagerView } from './views/ManagerView'
 import { RequesterView } from './views/RequesterView'
+
+type Espace = 'gestion' | 'mesDemandes'
 
 export default function App() {
   const utilisateur = useCurrentUser()
   const donnees = useTickets()
+  const [espace, setEspace] = useState<Espace>('gestion')
+
+  const estGestionnaire = utilisateur.role === 'gestionnaire'
+  const pret = donnees.charge && utilisateur.charge
 
   return (
     <FluentProvider theme={webLightTheme}>
@@ -25,7 +26,9 @@ export default function App() {
             display: 'flex',
             justifyContent: 'space-between',
             alignItems: 'center',
-            marginBottom: '16px',
+            marginBottom: '12px',
+            flexWrap: 'wrap',
+            gap: '8px',
           }}
         >
           <Subtitle2>GoGo Helper</Subtitle2>
@@ -34,6 +37,17 @@ export default function App() {
             {utilisateur.role})
           </Caption1>
         </header>
+
+        {estGestionnaire && (
+          <TabList
+            selectedValue={espace}
+            onTabSelect={(_, d) => setEspace(d.value as Espace)}
+            style={{ marginBottom: '12px' }}
+          >
+            <Tab value="gestion">Tous les tickets</Tab>
+            <Tab value="mesDemandes">Mes demandes</Tab>
+          </TabList>
+        )}
 
         {donnees.erreur !== '' && (
           <MessageBar intent="error" style={{ marginBottom: '12px' }}>
@@ -45,8 +59,10 @@ export default function App() {
           </MessageBar>
         )}
 
-        {!donnees.charge || !utilisateur.charge ? (
+        {!pret ? (
           <Spinner label="Chargement des tickets…" />
+        ) : estGestionnaire && espace === 'gestion' ? (
+          <ManagerView utilisateur={utilisateur} donnees={donnees} />
         ) : (
           <RequesterView utilisateur={utilisateur} donnees={donnees} />
         )}
