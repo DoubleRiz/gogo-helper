@@ -51,15 +51,24 @@ export function TicketPanel({ ticket, choix, utilisateur, onFermer, onEnregistre
       dateEcheance: echeance,
       commentaire,
     }
-    await onEnregistrer(ticket.id, changements)
-    onFermer()
+    try {
+      await onEnregistrer(ticket.id, changements)
+      onFermer()
+    } catch {
+      // L'erreur est déjà affichée via le bandeau global ; on garde le
+      // panneau ouvert pour que l'utilisateur ne perde pas sa saisie.
+    }
   }
 
   async function supprimer() {
     if (!ticket) return
     setConfirmationOuverte(false)
-    await onSupprimer(ticket.id)
-    onFermer()
+    try {
+      await onSupprimer(ticket.id)
+      onFermer()
+    } catch {
+      // L'erreur est déjà affichée via le bandeau global.
+    }
   }
 
   return (

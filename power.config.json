@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "appId": null,
+  "appId": "f6f01ad7-c722-4127-aebc-8e486d35ae93",
   "appDisplayName": "GoGo Helper",
   "region": "prod",
   "environmentId": "45e88849-549a-ed59-8a14-eac0b2496cfd",
@@ -25,6 +25,17 @@
           }
         }
       }
+    },
+    "3bf33620-fd7f-438e-9bc1-27d8eed7f656": {
+      "id": "/providers/microsoft.powerapps/apis/shared_office365",
+      "displayName": "Office 365 Outlook"
+    },
+    "a9eb194f-2230-470f-aa8b-f0f42ad97e45": {
+      "id": "/providers/Microsoft.PowerApps/apis/shared_logicflows",
+      "displayName": "Logic flows",
+      "dataSources": [
+        "notifierunnouveauticket"
+      ]
     }
   },
   "databaseReferences": {}

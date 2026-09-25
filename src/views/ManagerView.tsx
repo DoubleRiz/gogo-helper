@@ -1,7 +1,8 @@
 import { useMemo, useState } from 'react'
-import { Caption1, Tab, TabList } from '@fluentui/react-components'
+import { Button, Caption1, MessageBar, MessageBarActions, MessageBarBody, Tab, TabList } from '@fluentui/react-components'
 import type { UtilisateurCourant } from '../auth/useCurrentUser'
 import type { EtatTickets } from '../data/useTickets'
+import { alerterEquipeIT } from '../data/ticketRepository'
 import type { EtatFiltres } from '../domain/filters'
 import { filterTickets, filtresVides } from '../domain/filters'
 import { appliquerChangementStatut, dateDuJour } from '../domain/statut'
@@ -22,6 +23,16 @@ export function ManagerView({ utilisateur, donnees }: Props) {
   const [affichage, setAffichage] = useState<Affichage>('kanban')
   const [filtres, setFiltres] = useState<EtatFiltres>(filtresVides)
   const [ticketOuvert, setTicketOuvert] = useState<Ticket | null>(null)
+  const [envoiAlerte, setEnvoiAlerte] = useState(false)
+  const [erreurAlerte, setErreurAlerte] = useState('')
+
+  function alerter() {
+    setEnvoiAlerte(true)
+    setErreurAlerte('')
+    alerterEquipeIT()
+      .catch((erreur: Error) => setErreurAlerte(erreur.message))
+      .finally(() => setEnvoiAlerte(false))
+  }
 
   const visibles = useMemo(
     () => filterTickets(donnees.tickets, filtres, utilisateur.email),
@@ -29,15 +40,30 @@ export function ManagerView({ utilisateur, donnees }: Props) {
   )
 
   function changerStatut(ticket: Ticket, statut: string) {
-    void donnees.modifier(ticket.id, appliquerChangementStatut(ticket, statut, dateDuJour()))
+    donnees.modifier(ticket.id, appliquerChangementStatut(ticket, statut, dateDuJour())).catch(() => {})
   }
 
   return (
     <div>
-      <TabList selectedValue={affichage} onTabSelect={(_, d) => setAffichage(d.value as Affichage)}>
-        <Tab value="kanban">Kanban</Tab>
-        <Tab value="liste">Liste</Tab>
-      </TabList>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '8px' }}>
+        <TabList selectedValue={affichage} onTabSelect={(_, d) => setAffichage(d.value as Affichage)}>
+          <Tab value="kanban">Kanban</Tab>
+          <Tab value="liste">Liste</Tab>
+        </TabList>
+
+        <Button appearance="secondary" disabled={envoiAlerte} onClick={alerter}>
+          {envoiAlerte ? 'Envoi…' : "Alerter l'équipe IT"}
+        </Button>
+      </div>
+
+      {erreurAlerte !== '' && (
+        <MessageBar intent="error" style={{ marginTop: '12px' }}>
+          <MessageBarBody>{erreurAlerte}</MessageBarBody>
+          <MessageBarActions>
+            <Button size="small" appearance="subtle" onClick={() => setErreurAlerte('')}>Fermer</Button>
+          </MessageBarActions>
+        </MessageBar>
+      )}
 
       <div style={{ marginTop: '12px' }}>
         <TicketFilters

@@ -5,7 +5,9 @@
 
 // Models
 export * as CommonModels from './models/CommonModels';
+export * as NotifierunnouveauticketModel from './models/NotifierunnouveauticketModel';
 export * as Tickets_SharePointModel from './models/Tickets_SharePointModel';
 
 // Services
+export * from './services/NotifierunnouveauticketService';
 export * from './services/Tickets_SharePointService';

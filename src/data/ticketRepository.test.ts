@@ -54,13 +54,28 @@ describe('listerTickets', () => {
 describe('creerTicket', () => {
   it('envoie l’enregistrement traduit et renvoie le ticket créé', async () => {
     create.mockResolvedValue({ success: true, data: { ID: 5, Title: 'Imprimante' } })
-    const ticket = await creerTicket({
+    const nouveau = {
       titre: 'Imprimante', description: 'Bourrage', categorie: 'Matériel',
       priorite: 'Basse', statut: 'Nouveau', demandeur: 'Alice', emailDemandeur: 'alice@exemple.fr',
       gestionnaire: '', dateCreation: '2026-08-28', dateEcheance: '', dateResolution: '', commentaire: '',
-    })
+    }
+    const ticket = await creerTicket(nouveau)
     expect(create).toHaveBeenCalledWith(expect.objectContaining({ Title: 'Imprimante', field_5: 'Nouveau' }))
-    expect(ticket.id).toBe(5)
+    expect(ticket).toEqual({ ...nouveau, id: 5, modifie: '' })
+  })
+
+  it('ne perd pas les champs envoyés quand le connecteur ne renvoie que l’identifiant', async () => {
+    create.mockResolvedValue({ success: true, data: { ID: 9, Modified: '2026-08-28T10:00:00Z' } })
+    const ticket = await creerTicket({
+      titre: 'Écran cassé', description: 'Fissure sur le coin', categorie: 'Matériel',
+      priorite: 'Haute', statut: 'Nouveau', demandeur: 'Bob', emailDemandeur: 'bob@exemple.fr',
+      gestionnaire: '', dateCreation: '2026-08-28', dateEcheance: '', dateResolution: '', commentaire: '',
+    })
+    expect(ticket.statut).toBe('Nouveau')
+    expect(ticket.categorie).toBe('Matériel')
+    expect(ticket.description).toBe('Fissure sur le coin')
+    expect(ticket.id).toBe(9)
+    expect(ticket.modifie).toBe('2026-08-28T10:00:00Z')
   })
 
   it('lève une erreur explicite en cas d’échec', async () => {

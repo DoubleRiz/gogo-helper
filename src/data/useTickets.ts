@@ -70,11 +70,18 @@ export function useTickets(): EtatTickets {
       return actuels.map((t) => (t.id === id ? { ...t, ...changements } : t))
     })
     try {
+      // Le connecteur SharePoint ne renvoie que l'identifiant et les champs
+      // modifiés, pas l'enregistrement complet : remplacer le ticket local
+      // par cette réponse effacerait les champs non touchés (et ferait
+      // disparaître le ticket du kanban si `statut` n'en fait pas partie).
       const aJour = await majTicket(id, changements)
-      setTickets((actuels) => actuels.map((t) => (t.id === id ? aJour : t)))
+      setTickets((actuels) =>
+        actuels.map((t) => (t.id === id ? { ...t, ...changements, modifie: aJour.modifie } : t)),
+      )
     } catch (e) {
       setTickets(precedents)
       setErreur(messageDe(e, 'Impossible de mettre à jour le ticket.'))
+      throw e
     }
   }, [])
 
@@ -90,6 +97,7 @@ export function useTickets(): EtatTickets {
     } catch (e) {
       setTickets(precedents)
       setErreur(messageDe(e, 'Impossible de supprimer le ticket.'))
+      throw e
     }
   }, [])
 

@@ -1,5 +1,6 @@
 import type { IOperationResult } from '@microsoft/power-apps/data'
 import { Tickets_SharePointService } from '../generated/services/Tickets_SharePointService'
+import { NotifierunnouveauticketService } from '../generated/services/NotifierunnouveauticketService'
 import type { Tickets_SharePointRead } from '../generated/models/Tickets_SharePointModel'
 import type { NouveauTicket, Ticket } from '../domain/ticket'
 import { toTicket, toWriteRecord } from '../domain/ticket'
@@ -22,7 +23,12 @@ export async function listerTickets(): Promise<Ticket[]> {
 
 export async function creerTicket(nouveau: NouveauTicket): Promise<Ticket> {
   const resultat = await Tickets_SharePointService.create(toWriteRecord(nouveau))
-  return toTicket(deballer(resultat, 'Impossible de créer le ticket.'))
+  const enregistrement = deballer(resultat, 'Impossible de créer le ticket.')
+  // Le connecteur SharePoint ne renvoie fiablement que l'identifiant (et parfois
+  // le titre) sur une création, pas l'enregistrement complet : on garde donc les
+  // champs qu'on vient d'envoyer et on ne prend du serveur que l'id et la date
+  // de modification.
+  return { ...nouveau, id: enregistrement.ID ?? 0, modifie: enregistrement.Modified ?? '' }
 }
 
 export async function majTicket(id: number, changements: Partial<Ticket>): Promise<Ticket> {
@@ -32,4 +38,10 @@ export async function majTicket(id: number, changements: Partial<Ticket>): Promi
 
 export async function supprimerTicket(id: number): Promise<void> {
   await Tickets_SharePointService.delete(String(id))
+}
+
+/** Déclenche le flow de test « Notifier un nouveau ticket » pour vérifier qu'il fonctionne. */
+export async function alerterEquipeIT(): Promise<void> {
+  const resultat = await NotifierunnouveauticketService.Run({ text: 'gautier.baleda@alegria.academy' })
+  deballer(resultat, "Impossible de contacter l'équipe IT.")
 }
