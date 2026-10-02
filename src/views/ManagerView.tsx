@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react'
 import { Button, Caption1, MessageBar, MessageBarActions, MessageBarBody, Tab, TabList } from '@fluentui/react-components'
 import type { UtilisateurCourant } from '../auth/useCurrentUser'
 import type { EtatTickets } from '../data/useTickets'
-import { alerterEquipeIT } from '../data/ticketRepository'
+import { notifierNouveauTicket } from '../data/ticketRepository'
 import type { EtatFiltres } from '../domain/filters'
 import { filterTickets, filtresVides } from '../domain/filters'
 import { appliquerChangementStatut, dateDuJour } from '../domain/statut'
@@ -29,7 +29,13 @@ export function ManagerView({ utilisateur, donnees }: Props) {
   function alerter() {
     setEnvoiAlerte(true)
     setErreurAlerte('')
-    alerterEquipeIT()
+    // Notification de test : le flow est déclenché automatiquement à chaque
+    // création de ticket, ce bouton sert seulement à vérifier qu'il répond.
+    notifierNouveauTicket({
+      titre: 'Test de notification',
+      description: "Message de test envoyé depuis GoGo Helper.",
+      priorite: 'Moyenne',
+    })
       .catch((erreur: Error) => setErreurAlerte(erreur.message))
       .finally(() => setEnvoiAlerte(false))
   }

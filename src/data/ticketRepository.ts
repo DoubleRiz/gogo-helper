@@ -4,6 +4,9 @@ import { NotifierunnouveauticketService } from '../generated/services/Notifierun
 import type { Tickets_SharePointRead } from '../generated/models/Tickets_SharePointModel'
 import type { NouveauTicket, Ticket } from '../domain/ticket'
 import { toTicket, toWriteRecord } from '../domain/ticket'
+import type { ChampsNotifies } from '../domain/notification'
+import { toNotificationInput } from '../domain/notification'
+import { appConfig } from '../config/app.config'
 
 /** Déballe un résultat d'opération, ou lève une erreur lisible par l'utilisateur. */
 function deballer<T>(resultat: IOperationResult<T>, messageParDefaut: string): T {
@@ -40,8 +43,14 @@ export async function supprimerTicket(id: number): Promise<void> {
   await Tickets_SharePointService.delete(String(id))
 }
 
-/** Déclenche le flow de test « Notifier un nouveau ticket » pour vérifier qu'il fonctionne. */
-export async function alerterEquipeIT(): Promise<void> {
-  const resultat = await NotifierunnouveauticketService.Run({ text: 'gautier.baleda@alegria.academy' })
+/**
+ * Déclenche le flow « Notifier un nouveau ticket », qui envoie le mail à
+ * l'équipe IT. Les gestionnaires configurés sont les destinataires : le
+ * connecteur Outlook accepte plusieurs adresses séparées par des points-virgules.
+ */
+export async function notifierNouveauTicket(ticket: ChampsNotifies): Promise<void> {
+  const resultat = await NotifierunnouveauticketService.Run(
+    toNotificationInput(ticket, appConfig.managerEmails.join(';')),
+  )
   deballer(resultat, "Impossible de contacter l'équipe IT.")
 }

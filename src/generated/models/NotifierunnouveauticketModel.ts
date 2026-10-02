@@ -6,4 +6,10 @@
 export interface ManualTriggerInput {
   // emailEquipeIT
   text: string;
+  // description
+  text_1: string;
+  // priorite
+  text_2: string;
+  // titre
+  text_3: string;
 }

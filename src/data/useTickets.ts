@@ -3,7 +3,7 @@ import type { Choix } from '../domain/choices'
 import { collectChoices } from '../domain/choices'
 import { trierParDateCreationDesc } from '../domain/filters'
 import type { NouveauTicket, Ticket } from '../domain/ticket'
-import { creerTicket, listerTickets, majTicket, supprimerTicket } from './ticketRepository'
+import { creerTicket, listerTickets, majTicket, notifierNouveauTicket, supprimerTicket } from './ticketRepository'
 
 export interface EtatTickets {
   tickets: Ticket[]
@@ -51,6 +51,11 @@ export function useTickets(): EtatTickets {
     try {
       const cree = await creerTicket(nouveau)
       setTickets((precedents) => trierParDateCreationDesc([cree, ...precedents]))
+      // Le ticket est enregistré : si le mail à l'équipe IT échoue, on le
+      // signale dans la console sans faire échouer la création côté écran.
+      void notifierNouveauTicket(cree).catch((e: unknown) => {
+        console.error(messageDe(e, "Impossible de prévenir l'équipe IT."))
+      })
     } catch (e) {
       setErreur(messageDe(e, 'Impossible de créer le ticket.'))
       throw e

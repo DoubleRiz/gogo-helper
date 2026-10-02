@@ -71,10 +71,34 @@
               "type": "string",
               "x-ms-content-hint": "TEXT",
               "x-ms-dynamically-added": true
+            },
+            "text_1": {
+              "description": "description",
+              "title": "Texte 1",
+              "type": "string",
+              "x-ms-content-hint": "TEXT",
+              "x-ms-dynamically-added": true
+            },
+            "text_2": {
+              "description": "priorite",
+              "title": "Texte 2",
+              "type": "string",
+              "x-ms-content-hint": "TEXT",
+              "x-ms-dynamically-added": true
+            },
+            "text_3": {
+              "description": "titre",
+              "title": "Texte 3",
+              "type": "string",
+              "x-ms-content-hint": "TEXT",
+              "x-ms-dynamically-added": true
             }
           },
           "required": [
-            "text"
+            "text",
+            "text_1",
+            "text_2",
+            "text_3"
           ]
         }
       },
